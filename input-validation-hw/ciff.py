@@ -219,7 +219,7 @@ class CIFF:
                 # unpack returns a list
                 # HINT: check the "q" format specifier!
                 # HINT: Does it fit our purposes?
-                new_ciff.header_size = struct.unpack("q", h_size)[0]
+                new_ciff.header_size = struct.unpack("Q", h_size)[0]
 
                 # the header size must be in [38, 2^64 - 1]
                 # TODO: check the value range. If not in range, raise Exception
@@ -238,7 +238,7 @@ class CIFF:
                 # interpret the bytes as an 8-byte-long integer
                 # HINT: check out the "q" format specifier!
                 # HINT: Does it fit our purposes?
-                new_ciff.content_size = struct.unpack("q", c_size)[0]
+                new_ciff.content_size = struct.unpack("Q", c_size)[0]
 
                 # the content size must be in [0, 2^64 - 1]
                 # TODO: check the value range. If not in range, raise Exception
@@ -257,7 +257,7 @@ class CIFF:
                 # interpret the bytes as an 8-byte-long integer
                 # HINT: check out the "q" format specifier!
                 # HINT: Does it fit our purposes?
-                new_ciff.width = struct.unpack("q", width)[0]
+                new_ciff.width = struct.unpack("Q", width)[0]
                 # the width must be in [0, 2^64 - 1]
                 # TODO: check the value range. If not in range, raise Exception
                 # Question: is this check necessary?
@@ -268,14 +268,14 @@ class CIFF:
                 height = ciff_file.read(8)
 
                 # TODO: check if height contains 8 bytes
-                if new_ciff.height < 0 or new_ciff.height > 2**64 - 1:
+                if len(height) != 8:
                     raise Exception("Invalid height bytes size!")
                 bytes_read += 8
 
                 # interpret the bytes as an 8-byte-long integer
                 # HINT: check out the "q" format specifier!
                 # HINT: Does it fit our purposes?
-                new_ciff.height = struct.unpack("q", height)[0]
+                new_ciff.height = struct.unpack("Q", height)[0]
 
                 # the height must be in [0, 2^64 - 1]
                 # TODO: check the value range
@@ -327,7 +327,7 @@ class CIFF:
                     char = c.decode('ascii')
                     # tags should not contain '\n'
                     # TODO: char must not be a '\n'
-                    if c == '\n':
+                    if char == '\n':
                         raise Exception("Invalid tag format!")
 
                     # tags are separated by terminating nulls
@@ -338,8 +338,8 @@ class CIFF:
 
                     # the very last character in the header must be a '\0'
                     # TODO: check the last character of the header
-                    if (bytes_read != new_ciff.header_size - 1) and char == "\0":
-                        raise Exception("Invalid tag format!")
+                    if bytes_read== new_ciff.header_size and char != '\0':
+                        raise Exception("Invalid tag format: header must end with null byte")
 
                 # all tags must end with '\0'
                 # TODO: check the end of each tag for the '\0'
