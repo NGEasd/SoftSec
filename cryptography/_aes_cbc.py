@@ -62,7 +62,7 @@ if operation == 'enc':
 
     # read the content of the input file into a variable called plaintext
     with open(ifile_name, 'rb') as f:
-        plaintext = f.read()
+        plaintext = f.read().replace(b'\r\n', b'\n') #f.read()
 
     # apply PKCS7 style padding on the plaintext
     padded_plaintext = Padding.pad(plaintext, 16, style="pkcs7")
